@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">SpcLauncher</string>
+    <string name="lbl_password">Enter Unlock Password :</string>
+    <string name="password_incorrect">Password incorrect.  Please try again.</string>
+    <string name="btn_submit">Submit</string>
+</resources>
