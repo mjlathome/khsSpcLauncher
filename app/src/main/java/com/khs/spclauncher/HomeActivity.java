@@ -1,13 +1,28 @@
 package com.khs.spclauncher;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Created by Mark on 3/29/2016.
@@ -26,9 +41,16 @@ public class HomeActivity extends Activity {
     private Intent mSpcIntent;
     private int mExitCLick = 0;
 
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        blockStatusBarPullDown();
         setContentView(R.layout.activity_home);
 
         // build intent for spc measure
@@ -52,6 +74,9 @@ public class HomeActivity extends Activity {
                 e.printStackTrace();
             }
         }
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     // stop back button from functioning
@@ -65,7 +90,7 @@ public class HomeActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             // check password request
             case REQUEST_CODE_PSWD:
                 // check password matched
@@ -98,6 +123,36 @@ public class HomeActivity extends Activity {
         manager = getPackageManager();
         manager.clearPackagePreferredActivities(this.getPackageName());
 
+    }
+
+    // block the status bar from being pulled down
+    // see:
+    // http://stackoverflow.com/questions/25284233/prevent-status-bar-for-appearing-android-modified?answertab=active#tab-top
+    // https://gist.github.com/sarme/7e4dc90e2478ade310e6
+    private void blockStatusBarPullDown() {
+
+        WindowManager manager = ((WindowManager) getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE));
+
+        WindowManager.LayoutParams localLayoutParams = new WindowManager.LayoutParams();
+        localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
+        localLayoutParams.gravity = Gravity.TOP;
+        localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|
+
+            // this is to enable the notification to recieve touch events
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+
+            // Draws over status bar
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+
+        localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+        localLayoutParams.height = (int) (50 * getResources()
+                .getDisplayMetrics().scaledDensity);
+        localLayoutParams.format = PixelFormat.TRANSPARENT;
+
+        CustomViewGroup view = new CustomViewGroup(this);
+
+        manager.addView(view, localLayoutParams);
     }
 
 }
