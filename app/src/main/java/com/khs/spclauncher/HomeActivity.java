@@ -38,6 +38,7 @@ public class HomeActivity extends Activity {
 
     private PackageManager manager;
 
+
     private Intent mSpcIntent;
     private int mExitCLick = 0;
 
