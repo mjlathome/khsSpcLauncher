@@ -1,6 +1,8 @@
 package com.khs.spclauncher;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -10,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -37,7 +40,7 @@ public class HomeActivity extends Activity {
     private static final int EXIT_COUNT = 10;
 
     private PackageManager manager;
-
+    private CustomViewGroup mStatusBarView;
 
     private Intent mSpcIntent;
     private int mExitCLick = 0;
@@ -87,6 +90,21 @@ public class HomeActivity extends Activity {
         // super.onBackPressed();
     }
 
+    // stop recent task/task manager overlay
+    /*
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        Log.d(TAG, "Focus changed = " + hasFocus);
+
+        if (!hasFocus) {
+            Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(closeDialog);
+        }
+    }
+    */
+
     // handle activity results
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -97,6 +115,7 @@ public class HomeActivity extends Activity {
                 // check password matched
                 if (resultCode == RESULT_OK) {
                     clearPreferred();
+                    allowStatusBarPullDown();
                     finish();
                 }
         }
@@ -138,22 +157,32 @@ public class HomeActivity extends Activity {
         WindowManager.LayoutParams localLayoutParams = new WindowManager.LayoutParams();
         localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
         localLayoutParams.gravity = Gravity.TOP;
-        localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|
+        localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
 
-            // this is to enable the notification to recieve touch events
-            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                // this is to enable the notification to recieve touch events
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
 
-            // Draws over status bar
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+                // Draws over status bar
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
 
         localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         localLayoutParams.height = (int) (50 * getResources()
                 .getDisplayMetrics().scaledDensity);
         localLayoutParams.format = PixelFormat.TRANSPARENT;
 
-        CustomViewGroup view = new CustomViewGroup(this);
+        mStatusBarView = new CustomViewGroup(this);
 
-        manager.addView(view, localLayoutParams);
+        manager.addView(mStatusBarView, localLayoutParams);
     }
 
+    // allow the status bar to be pulled down
+    private void allowStatusBarPullDown() {
+
+        WindowManager manager = ((WindowManager) getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE));
+
+        if (mStatusBarView != null) {
+            manager.removeView(mStatusBarView);
+        }
+    }
 }
