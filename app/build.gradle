@@ -3,9 +3,9 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         karmax {
-            keyAlias 'KarmaxReleaseKey'
+            keyAlias 'karmax'
             keyPassword 'Kmx5571'
-            storeFile file('C:/Users/Mark/AndroidKeystore/karmax.release.jks')
+            storeFile file('C:/Users/mlees/AndroidKeystore/karmax.release.jks')
             storePassword 'Kmx5571'
         }
     }
@@ -29,7 +29,5 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }
