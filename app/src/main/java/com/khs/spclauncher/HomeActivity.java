@@ -8,24 +8,15 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import android.widget.Toast;
 
 /**
  * Created by Mark on 3/29/2016.
@@ -49,7 +40,24 @@ public class HomeActivity extends Activity {
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-    private GoogleApiClient client;
+    // private GoogleApiClient client;
+
+    // stop recent task/task manager overlay
+    // seesee
+    private Handler windowCloseHandler = new Handler();
+    private Runnable windowCloserRunnable = new Runnable() {
+        @Override
+        public void run() {
+            ActivityManager am = (ActivityManager)getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+            ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
+
+            Toast.makeText(getApplicationContext(), cn.getClassName(), Toast.LENGTH_LONG).show();
+            toggleRecents();
+            if (cn != null && cn.getClassName().equals("com.android.systemui.recent.RecentsActivity")) {
+                toggleRecents();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +88,6 @@ public class HomeActivity extends Activity {
         }
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     // stop back button from functioning
@@ -91,7 +98,6 @@ public class HomeActivity extends Activity {
     }
 
     // stop recent task/task manager overlay
-    /*
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -99,11 +105,11 @@ public class HomeActivity extends Activity {
         Log.d(TAG, "Focus changed = " + hasFocus);
 
         if (!hasFocus) {
-            Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            sendBroadcast(closeDialog);
+            windowCloseHandler.postDelayed(windowCloserRunnable, 250);
+            // Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            // sendBroadcast(closeDialog);
         }
     }
-    */
 
     // handle activity results
     @Override
@@ -142,7 +148,6 @@ public class HomeActivity extends Activity {
     private void clearPreferred() {
         manager = getPackageManager();
         manager.clearPackagePreferredActivities(this.getPackageName());
-
     }
 
     // block the status bar from being pulled down
@@ -184,5 +189,14 @@ public class HomeActivity extends Activity {
         if (mStatusBarView != null) {
             manager.removeView(mStatusBarView);
         }
+    }
+
+    // stop recent task/task manager overlay
+    private void toggleRecents() {
+        Intent closeRecents = new Intent("com.android.systemui.recent.action.TOGGLE_RECENTS");
+        closeRecents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        ComponentName recents = new ComponentName("com.android.systemui", "com.android.systemui.recent.RecentsActivity");
+        closeRecents.setComponent(recents);
+        this.startActivity(closeRecents);
     }
 }

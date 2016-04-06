@@ -5,7 +5,7 @@ android {
         karmax {
             keyAlias 'karmax'
             keyPassword 'Kmx5571'
-            storeFile file('C:/Users/mlees/AndroidKeystore/karmax.release.jks')
+            storeFile file('C:/Users/Mark/AndroidKeystore/karmax.release.jks')
             storePassword 'Kmx5571'
         }
     }
