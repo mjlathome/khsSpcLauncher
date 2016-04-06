@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+// see: http://stackoverflow.com/questions/24013790/how-to-dismiss-system-dialog-in-android
 public class SystemDialogReceiver extends BroadcastReceiver {
 
     // constants
