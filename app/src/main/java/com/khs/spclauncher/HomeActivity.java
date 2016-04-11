@@ -52,7 +52,6 @@ public class HomeActivity extends Activity {
             ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
 
             Toast.makeText(getApplicationContext(), cn.getClassName(), Toast.LENGTH_LONG).show();
-            toggleRecents();
             if (cn != null && cn.getClassName().equals("com.android.systemui.recent.RecentsActivity")) {
                 toggleRecents();
             }
@@ -105,7 +104,7 @@ public class HomeActivity extends Activity {
         Log.d(TAG, "Focus changed = " + hasFocus);
 
         if (!hasFocus) {
-            windowCloseHandler.postDelayed(windowCloserRunnable, 250);
+            // windowCloseHandler.postDelayed(windowCloserRunnable, 250);
             // Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
             // sendBroadcast(closeDialog);
         }
