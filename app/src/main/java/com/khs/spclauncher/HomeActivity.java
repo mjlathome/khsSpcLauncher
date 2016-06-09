@@ -28,6 +28,7 @@ public class HomeActivity extends Activity {
     protected static final String PASSWORD = "@m@zon01";
 
     private static final int REQUEST_CODE_PSWD = 1;
+    private static final int BT_COUNT = 5;
     private static final int EXIT_COUNT = 10;
 
     private PackageManager manager;
@@ -136,7 +137,11 @@ public class HomeActivity extends Activity {
     // exit to main home screen
     public void doExit(View v) {
         mExitCLick++;
-        if (mExitCLick == EXIT_COUNT) {
+
+        if (mExitCLick == BT_COUNT) {
+            Intent settings_intent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+            startActivityForResult(settings_intent, 0);
+        } else if (mExitCLick == EXIT_COUNT) {
             mExitCLick = 0;
             Intent intent = new Intent(this, PasswordActivity.class);
             startActivityForResult(intent, REQUEST_CODE_PSWD);
