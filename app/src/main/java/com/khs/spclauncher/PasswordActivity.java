@@ -31,13 +31,20 @@ public class PasswordActivity extends AppCompatActivity {
         input = input.trim();
 
         // check password matches
-        if (input.equals(HomeActivity.PASSWORD)) {
-            // return success
-            Intent result = new Intent();
-            setResult(RESULT_OK, result);
-            finish();
+        if (input.equals(HomeActivity.PASSWORD_SYSTEMS)) {
+            returnResult(HomeActivity.ACTION_EXIT);
+        } else if (input.equals(HomeActivity.PASSWORD_LAYOUT)) {
+            returnResult(HomeActivity.ACTION_BLUETOOTH);
         } else {
             Toast.makeText(this, getString(R.string.password_incorrect), Toast.LENGTH_LONG).show();
         }
+    }
+
+    // return success result to calling activity and exit
+    private void returnResult(int action) {
+        Intent result = new Intent();
+        result.putExtra(HomeActivity.ARG_ACTION, action);
+        setResult(RESULT_OK, result);
+        finish();
     }
 }

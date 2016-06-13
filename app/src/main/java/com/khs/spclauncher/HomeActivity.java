@@ -25,10 +25,21 @@ public class HomeActivity extends Activity {
     private static final String TAG = "HomeActivity";
 
     private static final String SPC_PACKAGE = "com.khs.spcmeasure";
-    protected static final String PASSWORD = "@m@zon01";
 
-    private static final int REQUEST_CODE_PSWD = 1;
-    private static final int BT_COUNT = 5;
+    // passwords to check
+    protected static final String PASSWORD_SYSTEMS = "@m@zon01";
+    protected static final String PASSWORD_LAYOUT = "layout01";
+
+    // action to perform
+    protected static final String ARG_ACTION = "action";
+    protected static final int ACTION_EXIT = 0;
+    protected static final int ACTION_BLUETOOTH = 1;
+
+    // result request codes
+    private static final int REQUEST_CODE_BLUETOOTH = 0;
+    private static final int REQUEST_CODE_PASSWORD = 1;
+
+    // number of background clicks required before password exit prompt
     private static final int EXIT_COUNT = 10;
 
     private PackageManager manager;
@@ -44,7 +55,7 @@ public class HomeActivity extends Activity {
     // private GoogleApiClient client;
 
     // stop recent task/task manager overlay
-    // seesee
+    // see
     private Handler windowCloseHandler = new Handler();
     private Runnable windowCloserRunnable = new Runnable() {
         @Override
@@ -117,12 +128,27 @@ public class HomeActivity extends Activity {
         // super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             // check password request
-            case REQUEST_CODE_PSWD:
+            case REQUEST_CODE_PASSWORD:
                 // check password matched
                 if (resultCode == RESULT_OK) {
-                    clearPreferred();
-                    allowStatusBarPullDown();
-                    finish();
+                    int action = data.getIntExtra(ARG_ACTION, -1);
+
+                    switch (action) {
+                        case ACTION_EXIT:
+                            // exit the launcher
+                            clearPreferred();
+                            allowStatusBarPullDown();
+                            finish();
+                            break;
+                        case ACTION_BLUETOOTH:
+                            // run Bluetooth settings
+                            Intent settings_intent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+                            startActivityForResult(settings_intent, REQUEST_CODE_BLUETOOTH);
+                            break;
+                        default:
+                            // do nothing
+                            break;
+                    }
                 }
         }
     }
@@ -138,13 +164,10 @@ public class HomeActivity extends Activity {
     public void doExit(View v) {
         mExitCLick++;
 
-        if (mExitCLick == BT_COUNT) {
-            Intent settings_intent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-            startActivityForResult(settings_intent, 0);
-        } else if (mExitCLick == EXIT_COUNT) {
+        if (mExitCLick == EXIT_COUNT) {
             mExitCLick = 0;
             Intent intent = new Intent(this, PasswordActivity.class);
-            startActivityForResult(intent, REQUEST_CODE_PSWD);
+            startActivityForResult(intent, REQUEST_CODE_PASSWORD);
         }
     }
 
